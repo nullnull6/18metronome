@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<!-- saved from url=(0046)https://mcbeeringi.github.io/apps/mc/poly.html -->
+<html lang="en" dir="ltr">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <title>MCDB</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react.js"></script>
+
+<script type="text/javascript"
+    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<body>
+
+    <style>
+        :root,
+        textarea,
+        input {
+            background-color: #222;
+            color: #fff;
+            font-family: menlo, monospace;
+        }
+
+        .box {
+            background-color: #333;
+            padding: 4px;
+            font-size: 13px;
+        }
+
+        a:link,
+        a:visited {
+            color: #aef;
+        }
+
+        a:link:hover {
+            color: #8af;
+        }
+
+        a:link:active {
+            color: #48f;
+        }
+
+        h1,
+        h2 {
+            padding: 0rem 1rem;
+            border-left: 4px solid #000;
+        }
+
+        #log {
+            line-height: 14px;
+            max-height: 448px;
+            overflow: scroll;
+            background-color: #333;
+        }
+
+        .input{
+            background-color: #0000;
+            display: inline-block;
+            border: none;
+            border-bottom: 2px solid #888;
+            border-radius: 0;
+            width: calc(100% - 10px);
+            max-width: 100%;
+            outline: none;
+            transition: .2s;
+        }
+        
+
+        input:not([type=radio]):focus {
+            border-bottom-color: #48fc;
+        }
+
+        .button:active {
+            background-color: #48fc;
+        }
+
+        textarea {
+            background-color: #0000;
+            line-height: 14px;
+            min-height: 10px;
+            width: calc(100% - 10px);
+            overflow: scroll;
+            resize: vertical;
+        }
+    </style>
+
+
+    <h1>18 metoronome</h1>
+    <div class="box">
+        <h1 id="BPMInfo">BPM:0</h1>
+
+        <p>BPM</p>
+        <input id="speed" type="range" name="speed" min="30" max="250" value="30" onchange="Init_metronome()">
+        <p>BEAT</p>
+        <input id="BEAT" type="range" name="speed" min="1" max="4" value="4" onchange="Init_metronome()">
+
+        <p id="info"></p>
+    </div>
+    <br>
+    <div class="box">
+        <h1>BGM</h1>
+        <p id="infoBGM"></p>
+        <input id="BGM" onchange="Change_BGM()">
+        <table border="1" cellpadding="5" cellspacing="0" bgcolor="#222" style="width: calc(100% - 8px);">
+        
+        <tr><td>01 [駅ビル,ショッピングモール]"</td></tr>
+        <tr><td>02 [カラオケ,ゲームセンター]"</td></tr>
+        <tr><td>03 [夏,夜,虫の鳴き声,せせらぎ]"</td></tr>
+        <tr><td>04 [飲食店街,路地裏,繁華街]"</td></tr>
+        <tr><td>05 [飛行機,乗り物]"</td></tr>
+        <tr><td>06 [飛行機,乗り物]"</td></tr>
+        <tr><td>07 [駅前,朝,市街地]"</td></tr>
+        <tr><td>08 [商店街,アーケード]"</td></tr>
+        <tr><td>09 [夜,田舎,無人駅]"</td></tr>
+        <tr><td>10 [夜,田舎,無人駅]"</td></tr>
+        <tr><td>11 [交差点,人通り,繁華街]"</td></tr>
+        <tr><td>12 [夜,せせらぎ]"</td></tr>
+        <tr><td>13 [天気,雨]"</td></tr>
+        <tr><td>14 [天気,雨,雷,遠雷]"</td></tr>
+        <tr><td>15 [天気,雷雨,轟音]"</td></tr>
+        <tr><td>16 [海,海水浴場,波]"</td></tr>
+        <tr><td>17 [海,海水浴場,波,賑やか]"</td></tr>
+        <tr><td>18 [祭り,祭囃子,夏祭り,蝉]"</td></tr>
+        <tr><td>19 [祭り,祭囃子,秋祭り,鈴虫]"</td></tr>
+        <tr><td>20 [夏,蝉]"</td></tr>
+        <tr><td>21 train_01_Eoden</td></tr>
+        <tr><td>22 0661_subway_02</td></tr>
+        <tr><td>23 0662_subway_03</td></tr>
+        <tr><td>24 0663_subway_04</td></tr>
+        <tr><td>25 0664_subway_05</td></tr>
+        <tr><td>26 イベントホール</td></tr>
+
+    </table>
+    </div>
+</body>
+
+
+
+<script>
+    const Silence = new Audio('sounds/s.mp3');
+
+    let Breathing = [];
+    Breathing.push(new Audio('sounds/su/echioto_息を吸う02.mp3'));
+    Breathing.push(new Audio('sounds/su/echioto_息を吸う03.mp3'));
+
+    let an = [];
+    an.push(new Audio('sounds/ae/echioto_ああっ.mp3'));
+    an.push(new Audio('sounds/ae/echioto_ああっ02.mp3'));
+    an.push(new Audio('sounds/ae/echioto_ああっ03.mp3'));
+    an.push(new Audio('sounds/ae/echioto_ああっ04.mp3'));
+    an.push(new Audio('sounds/ae/echioto_あんっ.mp3'));
+    an.push(new Audio('sounds/ae/echioto_あんっ02.mp3'));
+    an.push(new Audio('sounds/ae/echioto_あんっ03.mp3'));
+    an.push(new Audio('sounds/ae/echioto_あんっ04.mp3'));
+
+    let aa = [];
+    aa.push(new Audio("sounds/aa/echioto_ああ〜・・・.mp3"));
+    aa.push(new Audio("sounds/aa/echioto_ああ〜・・・02-1.mp3"));
+    aa.push(new Audio("sounds/aa/echioto_ああ〜・・・02.mp3"));
+
+    let nn = [];
+    nn.push(new Audio("sounds/nn/echioto_んっ.mp3"));
+    nn.push(new Audio("sounds/nn/echioto_んっ02.mp3"));
+    nn.push(new Audio("sounds/nn/echioto_んっ03.mp3"));
+    nn.push(new Audio("sounds/nn/echioto_んっ04.mp3"));
+    nn.push(new Audio("sounds/nn/echioto_んっ05.mp3"));
+    nn.push(new Audio("sounds/nn/echioto_んっ06.mp3"));
+    nn.push(new Audio("sounds/nn/echioto_んんっ.mp3"));
+    nn.push(new Audio("sounds/nn/echioto_んんっ02.mp3"));
+
+    let nnn = [];
+    nnn.push(new Audio("sounds/nnn/echioto_んん〜.mp3"));
+    nnn.push(new Audio("sounds/nnn/echioto_んん〜02.mp3"));
+    nnn.push(new Audio("sounds/nnn/echioto_んん〜03.mp3"));
+    nnn.push(new Audio("sounds/nnn/echioto_んん〜04.mp3"));
+
+    let oho = [];
+    oho.push(new Audio("sounds/nn/echioto_んおお.mp3"));
+    oho.push(new Audio("sounds/oho/echioto_おぉお.mp3"));
+    oho.push(new Audio("sounds/oho/echioto_おっ.mp3"));
+    oho.push(new Audio("sounds/oho/echioto_おっ02.mp3"));
+    oho.push(new Audio("sounds/oho/echioto_おっ03.mp3"));
+    oho.push(new Audio("sounds/oho/echioto_おほっ.mp3"));
+    oho.push(new Audio("sounds/oho/echioto_おほっ02.mp3"));
+    oho.push(new Audio("sounds/oho/echioto_おほっ03.mp3"));
+
+    let soho = [];
+    soho.push(new Audio("sounds/oho/echioto_おっ.mp3"));
+    soho.push(new Audio("sounds/oho/echioto_おっ02.mp3"));
+    soho.push(new Audio("sounds/oho/echioto_おっ03.mp3"));
+    
+    let ya = [];
+    ya.push(new Audio("sounds/ya/echioto_やぁ.mp3"));
+    ya.push(new Audio("sounds/ya/echioto_やぁ02.mp3"));
+
+    let yatt = [];
+    yatt.push(new Audio("sounds/ya/echioto_やっ！.mp3"));
+    yatt.push(new Audio("sounds/ya/echioto_やっ！02.mp3"));
+    yatt.push(new Audio("sounds/ya/echioto_やっ！03.mp3"));
+
+    let piston = [];
+    piston.push(new Audio("sounds/piston/piston (1).wav"));
+    piston.push(new Audio("sounds/piston/piston (2).wav"));
+    piston.push(new Audio("sounds/piston/piston (3).wav"));
+    piston.push(new Audio("sounds/piston/piston (4).wav"));
+    piston.push(new Audio("sounds/piston/piston (5).wav"));
+    piston.push(new Audio("sounds/piston/piston (6).wav"));
+    piston.push(new Audio("sounds/piston/piston (7).wav"));
+    piston.push(new Audio("sounds/piston/piston (8).wav"));
+    piston.push(new Audio("sounds/piston/piston (9).wav"));
+    piston.push(new Audio("sounds/piston/piston (10).wav"));
+    piston.push(new Audio("sounds/piston/piston (11).wav"));
+
+    let kankyo = [];
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音01[駅ビル,ショッピングモール].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音02[カラオケ,ゲームセンター].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音03[夏,夜,虫の鳴き声,せせらぎ].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音04[飲食店街,路地裏,繁華街].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音05[飛行機,乗り物].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音06[飛行機,乗り物].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音07[駅前,朝,市街地].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音08[商店街,アーケード].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音09[夜,田舎,無人駅].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音10[夜,田舎,無人駅].mp3"));
+
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音14[交差点,人通り,繁華街].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音15[夜,せせらぎ].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音16[天気,雨].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音17[天気,雨,雷,遠雷].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音18[天気,雷雨,轟音].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音19[海,海水浴場,波].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音20[海,海水浴場,波,賑やか].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音21[祭り,祭囃子,夏祭り,蝉].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音22[祭り,祭囃子,秋祭り,鈴虫].mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/PL18_環境音23[夏,蝉].mp3"));
+
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/VSQSE_0057_train_01_Eoden.mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/VSQSE_0661_subway_02.mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/VSQSE_0662_subway_03.mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/VSQSE_0663_subway_04.mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/VSQSE_0664_subway_05.mp3"));
+    kankyo.push(new Audio("sounds/PL18_効果音_mp3/PL18_環境音/イベントホール.mp3"));
+
+    let time=0;
+    let time2=0;
+    let Cbeat=0;
+    let beat=BEAT.value;
+    let tempo=speed.value;
+    let metronomeId=0;
+    let FeelingLevel=0;
+
+    let lastTimeIndex=-1;
+
+    let timerid=-1;
+    
+function Change_BGM(){
+    for(x of kankyo){
+        x.pause();
+        x.loop=true;
+        x.volume=0.0;
+    }
+    console.log(kankyo[Number(BGM.value-1)]);
+    kankyo[Number(BGM.value-1)].play();
+
+    clearInterval(timerid);
+
+    timerid = setInterval( ()=>{
+    if(kankyo[Number(BGM.value-1)].currentTime<2){
+        kankyo[Number(BGM.value-1)].volume += 0.005;
+    }else if(kankyo[Number(BGM.value-1)].duration-kankyo[Number(BGM.value-1)].currentTime<2){
+        kankyo[Number(BGM.value-1)].volume -= 0.005;
+    };
+    infoBGM.textContent=kankyo[Number(BGM.value-1)].volume;
+    console.log(kankyo[Number(BGM.value-1)].volume);
+    }, 100);
+}
+
+function Init_metronome(){
+    tempo=speed.value;
+    beat=BEAT.value;
+    BPMInfo.innerHTML=`BPM:${tempo}`;
+    clearInterval(metronomeId);
+    Silence.play();
+    metronomeId = setInterval(tickaegi, 60 / tempo*1000);
+} 
+
+function tickaegi(){
+    Cbeat++;
+
+    if(beat<=Cbeat){
+        let Cae = getCurrentVoice();
+        //Cae.playbackRate=beat/4 + tempo/110;
+
+        Cae.volume=0.2+(tempo**2)/(3*(240**2));
+        console.log((tempo**2)/(240**2));
+        //setPan(Cae,(tempo**2)/(240**2));
+        FeelingLevel++;
+        console.log(Cae);
+        Cae.play();
+        Cbeat=0;
+        setTimeout(()=>{
+            delete Cae;
+        },3000);
+        Init_metronome();
+        speed.value++;
+    }else if(Cbeat%2==0){
+        let audio = Breathing[Math.floor(Math.random()*2)].cloneNode();
+        audio.playbackRate=0.5 + tempo/110;
+
+        setPan(audio,(tempo**2)/(240**2))
+
+        audio.volume=0.05+(tempo**2)/(2*(240**2));
+        //audio.play();
+    }
+    let p = piston[Math.floor(Math.random()*piston.length)].cloneNode(); 
+    p.play();
+    setTimeout(()=>{
+            delete p;
+        },2000);
+    info.innerHTML=`${Cbeat}:FeelingLevel${FeelingLevel}`;
+    
+}
+
+function genRandomIndex(list){
+    let r=-1;
+    while(true){
+        r = Math.floor(Math.random()*list.length);
+        if(lastTimeIndex!=r) break;
+    }
+    lastTimeIndex=r;
+    return list[r];
+}
+
+function getCurrentVoice(){
+    let r;
+    if(tempo<50){
+        BEAT.value=4;
+        r=genRandomIndex(pickRandomElm([nnn,aa,ya])).cloneNode();
+        r.playbackRate=0.7;
+    }else if(tempo<100){
+        r=genRandomIndex(pickRandomElm([an,nn])).cloneNode();
+        r.playbackRate=0.8;
+    }else if(tempo<150){
+        BEAT.value=3;
+        r=genRandomIndex(pickRandomElm([an,nn,oho])).cloneNode();
+        r.playbackRate=0.9;
+    }else if(tempo<200){
+        BEAT.value=2;
+        r=genRandomIndex(pickRandomElm([an,nn,oho])).cloneNode();
+        r.playbackRate=1.1;
+    }else if(tempo<220){
+        BEAT.value=1;
+        r=genRandomIndex(pickRandomElm([an,nn,soho])).cloneNode();
+        r.playbackRate=1.2;
+    }else{
+        BEAT.value=1;
+        r=genRandomIndex(soho).cloneNode();
+        r.playbackRate=1.7;
+    }
+
+    return r;
+}
+
+function pickRandomElm(list){
+    return list[Math.floor(Math.random()*list.length)];
+}
+
+function setPan(audio,pan){
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var source = audioCtx.createMediaElementSource(audio);
+    var panNode = audioCtx.createStereoPanner();
+    panNode.pan.setValueAtTime(pan, audioCtx.currentTime);
+    source.connect(panNode);
+    panNode.connect(audioCtx.destination);
+}
+</script>
+
+</html>
